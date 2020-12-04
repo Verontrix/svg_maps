@@ -1,19 +1,23 @@
 <template>
   <div class="home">
     <v-container class="country list">
-      <v-layout row class="country" v-for="country in countries" :key="country.country">
+      <section class="country" v-for="country in countries" :key="country.country">
         <hr />
         <router-link :to="'country/' + country.country" class='navbutton'>
-          <v-col cols="12" md="6">
-            <Map class='map' :mapName=country.country></Map>
-          </v-col>
-          <v-col cols="12" md="6">
-            <h2>{{country.country}}</h2>
-            <p> {{country.leaderTitle}}: {{country.leader}}</p>
-            <p>Population: {{country.population}}</p>
-          </v-col>
+          <v-layout row>
+            <v-col cols="12" sm="6">
+              <Map class='map' :mapName=country.country></Map>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <div>
+                <h2>{{country.country}}</h2>
+                <p> {{country.leaderTitle}}: {{country.leader}}</p>
+                <p>Population: {{country.population}}</p>
+              </div>
+            </v-col>
+          </v-layout>
         </router-link>
-      </v-layout>
+      </section>
         <hr />
     </v-container>
   </div>
