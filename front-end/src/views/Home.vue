@@ -1,24 +1,28 @@
 <template>
   <div class="home">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-    <section class="country list">
-      <div class="country" v-for="country in countries" :key="country.country">
+    <v-container class="country list">
+      <v-layout row class="country" v-for="country in countries" :key="country.country">
         <hr />
         <router-link :to="'country/' + country.country" class='navbutton'>
-          <h2>{{country.country}}</h2>
-          <p> {{country.leaderTitle}}: {{country.leader}}</p>
-          <p>Population: {{country.population}}</p>
+          <v-col cols="12" md="6">
+            <Map class='map' :mapName=country.country></Map>
+          </v-col>
+          <v-col cols="12" md="6">
+            <h2>{{country.country}}</h2>
+            <p> {{country.leaderTitle}}: {{country.leader}}</p>
+            <p>Population: {{country.population}}</p>
+          </v-col>
         </router-link>
-      </div>
+      </v-layout>
         <hr />
-    </section>
+    </v-container>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
 import axios from 'axios';
+import Map from '@/components/Map.vue'
 
 export default {
   name: 'Home',
@@ -31,7 +35,7 @@ export default {
     this.getCountries();
   },
   components: {
-    HelloWorld
+    Map,
   },
   methods: {
     async getCountries() {
@@ -48,3 +52,11 @@ export default {
   }
 }
 </script>
+<style>
+.flexbox {
+  display: flex
+}
+.map {
+  width: 200px;
+}
+</style>

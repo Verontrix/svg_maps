@@ -16,33 +16,9 @@
         <input type="file" name="photo" @change="fileChanged">
         <button @click="upload">Upload</button>
       </div>
-    <div class="upload" v-if="addItem">
-      <h2>{{addItem.title}}</h2>
-      <img :src="addItem.path" />
-    </div>
-  </div>
-  <div class="heading">
-    <div class="circle">2</div>
-      <h2>Edit/Delete an Item</h2>
-    </div>
-    <div class="edit">
-      <div class="form">
-        <input v-model="findTitle" placeholder="Search">
-        <div class="suggestions" v-if="suggestions.length > 0">
-          <div class="suggestion" v-for="s in suggestions" :key="s.id" @click="selectItem(s)">{{s.title}}
-          </div>
-        </div>
-      </div>
-      <div class="upload" v-if="findItem">
-        <input v-model="findItem.title">
-        <p></p>
-        <textarea v-model="findItem.description" placeholder="Missing Description"> </textarea>
-        <p></p>
-        <img :src="findItem.path" />
-      </div>
-      <div class="actions" v-if="findItem">
-        <button @click="deleteItem(findItem)">Delete</button>
-        <button @click="editItem(findItem)">Edit</button>
+      <div class="upload" v-if="addItem">
+        <h2>{{addItem.title}}</h2>
+        <img :src="addItem.path" />
       </div>
     </div>
   </div>
