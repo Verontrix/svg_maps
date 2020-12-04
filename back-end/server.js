@@ -44,15 +44,6 @@ mongoose.connect('mongodb://localhost:27017/countries', {
   useNewUrlParser: true
 });
 
-app.post('/api/countrymap', upload.single('svg'), async (req, res) => {
-  // Safety check
-  if (!req.file) {
-    return res.sendStatus(400);
-  }
-})
-
-
-//use multer middleware to wait for the upload
 app.post('/api/country', async(req, res) => {
   // Safety check
   console.log("post /api/country called");
@@ -78,7 +69,6 @@ app.post('/api/country', async(req, res) => {
     res.sendStatus(500);
   }
 });
-
 // Pull the country from the database
 app.get('/api/country/:id', async (req, res) => {
   console.log(req.params.id);
@@ -97,7 +87,7 @@ app.get('/api/country/:id', async (req, res) => {
 app.get('/api/country', async (req, res) => {
   try {
     console.log("get /api/country called");
-    let countries = await Country.find();
+    let countries = await Country.find({}, {country:1, leader:1, leaderTitle:1, population:1});
     //console.log(countries);
     res.send(countries);
   } catch (error) {
@@ -107,9 +97,26 @@ app.get('/api/country', async (req, res) => {
 });
 app.delete('/api/country/:id', async (req, res) => {
   try {
-    await Item.deleteOne({
+    await Country.deleteOne({
       _id: req.params.id
     });
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+});
+//Edit the specified item
+app.put('/api/country/:id', async (req, res) => {
+  try {
+    let item = await Country.findOne({
+      _id: req.params.id
+    });
+    item.country = req.body.country;
+    item.leader = req.body.leader;
+    item.leaderTitle = req.body.leaderTitle;
+    item.population = req.body.population;
+    item.save();
     res.sendStatus(200);
   } catch (error) {
     console.log(error);

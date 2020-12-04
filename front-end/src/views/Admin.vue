@@ -6,7 +6,7 @@
       <h2>Add an Item</h2>
     </div>
     <div class="add">
-      <div class="form">
+      <v-form>
         <input v-model="country" placeholder="Country Name">
         <p></p>
         <input v-model="title" placeholder="Title">
@@ -16,11 +16,38 @@
         <input v-model="population" type="number" min="0" placeholder="1000000" step="100">
         <p></p>
         <input type="file" name="photo" @change="fileChanged">
-        <button @click="upload">Upload</button>
-      </div>
+        <v-btn @click="upload">Upload</v-btn>
+      </v-form>
       <div class="upload" v-if="addItem">
         <h2>{{addItem.title}}</h2>
         <img :src="addItem.path" />
+      </div>
+    </div>
+  <div class="heading">
+    <div class="circle">2</div>
+      <h2>Edit/Delete an Item</h2>
+    </div>
+    <div class="edit">
+      <div class="form">
+        <input v-model="findCountry" placeholder="Search">
+        <div class="suggestions" v-if="suggestions.length > 0">
+          <div class="suggestion" v-for="s in suggestions" :key="s.id" @click="selectItem(s)">{{s.country}}
+          </div>
+        </div>
+      </div>
+      <div class="upload" v-if="foundCountry">
+        <Map class='map' :mapId=foundCountry._id :key="componentKey"></Map>
+        <input v-model="foundCountry.country" placeholder="Country Name">
+        <p></p>
+        <input v-model="foundCountry.leaderTitle" placeholder="Title">
+        <p></p>
+        <input v-model="foundCountry.leader" placeholder="Leader">
+        <p></p>
+        <input v-model="foundCountry.population" type="number" min="0" placeholder="1000000" step="100">
+      </div>
+      <div class="actions" v-if="foundCountry">
+        <v-btn @click="deleteItem(foundCountry)">Delete</v-btn>
+        <v-btn @click="editItem(foundCountry)">Edit</v-btn>
       </div>
     </div>
   </div>
@@ -28,6 +55,7 @@
 
 <script>
 import axios from 'axios';
+import Map from '@/components/Map.vue'
 
 export default {
   name: 'Admin',
@@ -37,34 +65,74 @@ export default {
       population: 0,
       leader: "",
       title: "",
-      file: null,
+      uploadFile: null,
       addItem: null,
       countries: [],
-      findTitle: "",
-      findItem: null,
-      map: ""
+      findCountry: "",
+      foundCountry: null,
+      map: "",
+      editChangedSVG: false,
     }
+  },
+  components: {
+    Map
   },
   computed: {
     suggestions() {
-      //let countries = this.countries.filter(item => item.title.toLowerCase().startsWith(this.findTitle.toLowerCase()));
-      //return countries.sort((a, b) => a.title > b.title);
-      return "";
-    }
+      let countries = this.countries.filter(item => item.country.toLowerCase().startsWith(this.findCountry.toLowerCase()));
+      return countries.sort((a, b) => a.country > b.country);
+    },
+    componentKey() {
+      return this.foundCountry._id;
+    },
   },
   created() {
     this.getCountries();
   },
   methods: {
     fileChanged(event) {
-      this.file = event.target.files[0]
+      this.uploadFile = event.target.files[0]
     },
-    async upload() {
-      let self = this;
+    selectItem(item) {
+      this.findCountry = "";
+      this.foundCountry = item;
+      this.editCountry = item.country;
+      this.editPopulation = item.population;
+      this.editLeader = item.leader;
+      this.editTitle = item.leaderTitle;
+    },
+    async deleteItem(item) {
+      try {
+        await axios.delete("/api/country/" + item._id);
+        this.foundCountry = null;
+        this.getCountries();
+        return true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async editItem(item) {
+      try {
+        if (!this.editChangedSVG)
+        {
+          await axios.put("/api/country/" + item._id, {
+            country: this.editCountry,
+            leader: this.editLeader,
+            leaderTitle: this.editTitle,
+            population: this.editPopulation,
+          })
+        } else {
+          //reuploading svg, easiest to delete item again?
+          this.deleteItem(item);
+          this.uploadSVG(item, this.editFile)
+        }
+      } catch (error) {
+        //console.log(error);
+      }
+    },
+    async uploadSVG(item, file) {
       var reader = new FileReader();
-
-      console.log(this.file);
-
+      console.log(file);
       reader.onload = (event) => {
         console.log("On load called!");
         console.log(event.target.result);
@@ -77,30 +145,37 @@ export default {
           ignoreAttributes: false,
           parseAttributeValue: true,
         }, true);
-
         console.log(result);
-        console.log(self.country);
-        console.log(self.leader);
+        console.log(item.country);
+        console.log(item.leader);
         try {
           axios.post('/api/country', {
-            country: self.country,
-            leader: self.leader,
-            leaderTitle: self.title,
-            population: self.population,
+            country: item.country,
+            leader: item.leader,
+            leaderTitle: item.title,
+            population: item.population,
             regions: {
                 g: result.svg.g,
               }
           });
-        } catch (error)
-        {
-        console.log(error);
+        } catch (error) {
+          //console.log(error);
         }
+        reader.readAsText(this.file);
       }
-      reader.readAsText(this.file);
+    },
+    async upload() {
+      this.uploadSVG({
+        country: self.country,
+        leader: self.leader,
+        leaderTitle: self.title,
+        population: self.population,
+      }, this.uploadFile);
     },
     async getCountries() {
       try {
         let response = await axios.get("/api/country");
+        console.log(response);
         this.countries = response.data;
         return true;
       } catch (error) {
