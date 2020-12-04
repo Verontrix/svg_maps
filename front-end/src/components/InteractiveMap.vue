@@ -1,6 +1,6 @@
 <template>
   <div class='InteractiveMap'>
-    {{ WhoAmI }}
+    {{ mapName }}
     <div :id="svgId" class="svg-container"></div>
   </div>
 </template>
@@ -21,6 +21,7 @@ export default {
           imageHeight: 900,
       },
       svgContainer: null,
+      mapName: ""
     }
   },
   computed: {
@@ -39,7 +40,8 @@ export default {
       try {
         let response = await axios.get("/api/country/" + this.WhoAmI);
         this.map = response.data;
-        console.log(this.map);
+        this.mapName = response.data.country;
+        //console.log(this.map);
         return true;
       } catch (error) {
         //This is empty
@@ -90,3 +92,8 @@ export default {
   }
 }
 </script>
+<style>
+.InteractiveMap {
+  width: 70%
+}
+</style>

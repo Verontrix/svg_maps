@@ -13,6 +13,8 @@
         <p></p>
         <input v-model="leader" placeholder="Leader">
         <p></p>
+        <input v-model="population" type="number" min="0" placeholder="1000000" step="100">
+        <p></p>
         <input type="file" name="photo" @change="fileChanged">
         <button @click="upload">Upload</button>
       </div>

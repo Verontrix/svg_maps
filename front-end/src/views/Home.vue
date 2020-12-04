@@ -3,10 +3,10 @@
     <v-container class="country list">
       <section class="country" v-for="country in countries" :key="country.country">
         <hr />
-        <router-link :to="'country/' + country.country" class='navbutton'>
+        <router-link :to="'country/' + country._id" class='navbutton'>
           <v-layout row>
             <v-col cols="12" sm="6">
-              <Map class='map' :mapName=country.country></Map>
+              <Map class='map' :mapId=country._id></Map>
             </v-col>
             <v-col cols="12" sm="6">
               <div>

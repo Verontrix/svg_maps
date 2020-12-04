@@ -84,7 +84,7 @@ app.get('/api/country/:id', async (req, res) => {
   console.log(req.params.id);
   try {
     let country = await Country.findOne({
-      country: req.params.id,
+      _id: req.params.id,
     });
     console.log(country.regions.g);
     res.send(country);

@@ -7,12 +7,13 @@ import axios from 'axios';
 export default {
   name: "Map",
   props: {
-    mapName: String
+    mapName: String,
+    mapId: String,
   },
   data: function() {
     return {
       map: null,
-      svgId: this.mapName,
+      svgId: this.mapId,
       mapAttr: {
           viewBoxWidth: 1300,
           viewBoxHeight: 900,
@@ -34,7 +35,7 @@ export default {
   methods: {
     async getCountry() {
       try {
-        let response = await axios.get("/api/country/" + this.mapName);
+        let response = await axios.get("/api/country/" + this.mapId);
         this.map = response.data;
         console.log(this.map);
         return true;
