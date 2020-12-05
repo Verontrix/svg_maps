@@ -47,6 +47,7 @@ mongoose.connect('mongodb://localhost:27017/countries', {
 app.post('/api/country', async(req, res) => {
   // Safety check
   console.log("post /api/country called");
+  console.log(req.body);
   var regions = req.body.regions;
   var path = regions.g;
 

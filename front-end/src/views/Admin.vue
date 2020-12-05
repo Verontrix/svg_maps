@@ -57,6 +57,25 @@
 import axios from 'axios';
 import Map from '@/components/Map.vue'
 
+function getNames(obj, name) {
+  for (var key in obj) {
+    var property = Object.prototype.hasOwnProperty.call(obj,key);
+    if (property) {
+      var type = typeof(obj[key]);
+      if ( key == name)
+      {
+        return obj[key];
+      }
+      else if ("object" == type) {
+        var result = getNames(obj[key], name);
+        if (result != null)
+          return result;
+      }
+    }
+  }
+  return null;
+}
+
 export default {
   name: 'Admin',
   data() {
@@ -91,6 +110,8 @@ export default {
   },
   methods: {
     fileChanged(event) {
+      console.log("File Changed");
+      console.log(this.uploadFile);
       this.uploadFile = event.target.files[0]
     },
     selectItem(item) {
@@ -149,28 +170,36 @@ export default {
         console.log(item.country);
         console.log(item.leader);
         try {
-          axios.post('/api/country', {
+          var map = {
             country: item.country,
             leader: item.leader,
-            leaderTitle: item.title,
+            leaderTitle: item.leaderTitle,
             population: item.population,
-            regions: {
-                g: result.svg.g,
+            regions:{
+              g: {
               }
-          });
+            }
+          };
+          var path = getNames(result.svg, 'path');
+          map.regions.g.path = path;
+          axios.post('/api/country', map);
+          this.getCountries();
         } catch (error) {
           //console.log(error);
         }
-        reader.readAsText(this.file);
       }
+      reader.readAsText(file);
     },
     async upload() {
-      this.uploadSVG({
+      var self = this;
+      console.log("upload Called!");
+      var item = {
         country: self.country,
         leader: self.leader,
         leaderTitle: self.title,
         population: self.population,
-      }, this.uploadFile);
+      };
+      this.uploadSVG(item, this.uploadFile);
     },
     async getCountries() {
       try {
